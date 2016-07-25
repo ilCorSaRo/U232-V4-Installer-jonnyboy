@@ -1,0 +1,85 @@
+server {
+	# Change these settings to match your machine
+	#
+	listen 80; ## listen for ipv4; this line is default and implied
+	listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+	server_name localhost;
+
+	root /var/www/;
+	index index.php index.html;
+
+	location / {
+		try_files $uri $uri/ =404;
+		# Uncomment to enable naxsi on this location
+		# include /etc/nginx/naxsi.rules
+		#
+		# Enable to limit 1 connection per ip per second
+		# limit_req zone=one burst=5;
+		# limit_conn addr 2;
+	}
+
+	location ~ \.php$ {
+		try_files $uri =404;
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		# Sockets are faster, but for more concurrent connections, you need to use TCP/IP
+		# fastcgi_pass unix:/var/run/php5-fpm.sock;
+		#
+		fastcgi_pass 127.0.0.1:9000;
+		include fastcgi_params;
+	}
+
+	# deny access to .htaccess files, if Apache's document root
+	# concurs with nginx's one
+	#
+	location ~ /\.ht {
+		deny all;
+	}
+}
+
+server {
+	# Change these settings to match your machine
+	#
+	listen 443; ## listen for ipv4; this line is default and implied
+	listen [::]:443 default_server ipv6only=on; ## listen for ipv6
+	server_name localhost;
+
+	ssl on;
+	ssl_certificate /etc/ssl/nginx/conf/server.crt;
+	ssl_certificate_key /etc/ssl/nginx/conf/server.key;
+	# enables SSLv3/TLSv1, but not SSLv2 which is weak and should no longer be used.
+	#
+	ssl_protocols SSLv3 TLSv1;
+	# Disables all weak ciphers
+	#
+	ssl_ciphers ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM;
+
+	root /var/www/;
+	index index.php index.html;
+
+	location / {
+		try_files $uri $uri/ =404;
+		# Uncomment to enable naxsi on this location
+		# include /etc/nginx/naxsi.rules
+		#
+		# Enable to limit 1 connection per ip per second
+		# limit_req zone=one burst=5;
+		# limit_conn addr 2;
+	}
+
+	location ~ \.php$ {
+		try_files $uri =404;
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		# Sockets are faster, but for more concurrent connections, you need to use TCP/IP
+		# fastcgi_pass unix:/var/run/php5-fpm.sock;
+		#
+		fastcgi_pass 127.0.0.1:9000;
+		include fastcgi_params;
+	}
+
+	# deny access to .htaccess files, if Apache's document root
+	# concurs with nginx's one
+	#
+	location ~ /\.ht {
+		deny all;
+	}
+}
